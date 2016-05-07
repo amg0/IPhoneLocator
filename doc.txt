@@ -1,0 +1,181 @@
+From working going on the thread http://forum.micasaverde.com/index.php/topic,15565.0.html I created a plugin to report apple device position from the iCloud service. 
+
+Official version can be installed from the App Store. 
+Beta versions from here:
+[url=http://apps.mios.com/test-plugin.php?id=4686&show=versions]http://apps.mios.com/test-plugin.php?id=4686&show=versions[/url]
+
+I summarized herebelow the information and features for this plugin.
+[glow=red,2,300]New[/glow]: You will find a step by step UI5 installation document here: http://code.mios.com/trac/mios_iphone-detector/export/147/trunk/iPhoneLocator/Install%20Doc.pdf
+
+For those who really like it and feel like it, you can donate what you want here on Paypal. It will not buy you more support not any garantee that this can be maintained or evolve in the future but if you want to show you are happy and like my kids to transform some of the time I steal from them into some 'concrete' returns, please feel very free ( and absolutely not forced to ) to donate whatever you want.  thank you ! : [url=https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted]https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted[/url].
+
+[b]Version Change Log[/b]
+http://forum.micasaverde.com/index.php/topic,29732.msg210672.html#msg210672
+
+[b]Latest Version : 2.30[/b]
+[i]Features[/i]
+[list]
+[li]Monitor the location of one or more of your apple devices in a [b]single iCloud account[/b]. They are managed by a single root VERA device with a single polling loop updating all associated children devices for the multiple apple devices you want to monitor.  if you want to monitor only one device ( or have only one device in iCloud ), only the root VERA device is used so you will not see more than one device in that case.[/li]
+[li]Selectable [b]Distance calculation mode[/b] can be either direct, driving, walking or bicycling mode. Non direct mode uses [b]google matrix api[/b][/li]
+[li]Default calculation mode is "direct" which keeps all code and all older calls to google, so behavior should be not changed for those who do not want to use the new driving, walking or bicycling mode[/li]
+[li]Events for [b]Distance event[/b] (above/below) and for [b]Present[/b] (at home or not)[/li]
+[li]a [b]manual refresh mode[/b] to remove any automatic polling from VERA to iCloud and enable an external PLEG or scene to control when and to trigger refreshes[/li]
+[li][b]auto adaptive polling[/b] with an optional polling "map" which lets you set the distances and correspondant polling time you want[/li]
+[li][b]HouseMode (UI7)[/b] dynamically update UI7 HouseMode based on device presence status. See below for details[/li]
+[li][b]optional extra polling mode[/b] to get more accurate & precision from iCloud[/li]
+[li][b]Encryption [/b]of iCloud password is ready but I will enable it in a future version, just to seperate issues & concerns for testing this version[/li]
+[li][b]UI5/7[/b] dashboard
+[list]
+	[li]useful information ( distance, speed, date, selected polling duration )[/li]
+	[li]Exact position address display & [b]Privacy mode[/b] to only show present status.[/li]
+	[li]a [b]multiple state icon[/b] which shows states: present, muted, away-stable, away-coming closer, away-going away[/li]
+	[li][b]Mute and unmute[/b] buttons feature with its uPNP action as well, special Mute Icon for the muted state. [/li]
+	[li][b]Refresh [/b]button for manual refresh : Immediately take into account new polling frequency parameters[/li]
+[/list]
+[/li]
+[li][b]CONTROL[/b] Tab
+[list]
+	[li][b]Debug and unDebug[/b] buttons feature on Control TAB to enable debug verbosity levels in log files[/li]
+[/list]
+[/li]
+[li][b]SETTINGS[/b] tab
+[list]
+	[li]facilitate entry of parameters with Regular expression checking for format of parameters. user interface with [b]'sub-tabs'[/b] on the top to select pages of settings and have more screen real estate for parameters...[b]Dynamic[/b] save of changes in the Setting tabs. you just click the Save button in the TAB header bar ( top line ) at the bottom of the screen to save any changes. the button changes color: red if unsaved changes are pending, green or normal of changes were saved. Changes are not reflected in the browser until you do a Refresh tough...[/li]
+	[li][b]User interface[/b] to select device names from the actual list of iCloud devices declared in the account and that you want to track. The pattern matching remains available as well so things like .* or ^name$ continue to work. in order to use the editor you just select device name in the left list, or a pattern in the upper text box and then click on the "==>" button to move it of the list on the right which is the final list of device(s) you decide to keep for tracking. NOTE changing the list of devices to track [b][glow=red,2,300]requires[/glow][/b] Save + a number of Luup engine reload to really trigger the complete device initialisation sequence + a browser refresh to remove the cash. it can be confusing so respect the sequence...[/li]
+[/list]
+[/li]
+[li][b]GOOGLE MAP[/b] tab
+[list]
+[li]Showing base and moving device position with markers. includes all google map features, including satelite & street view ![/li]
+[li][b]Draggable [/b]base marker to set the Home location[/li]
+[li][b]Color [/b]coded markers to differentiate base from iDevices[/li]
+[li][b]Show All[b] buttons to see all devices of a single iCloud account on the map[/li]
+[li]Add a [b]Full Screen[/b] button to Map tab in order to open map in a blank window[/li]
+[li]Buttons to [b]center the map[/b] on the base or on the phone[/li]
+[li]CheckBoxs to [b]show the home-range and/or the polling map[/b] distances on the google map[/li]
+[/list]
+[/li]
+[/list]
+
+[i]Variables[/i]
+[list]
+[li][b]Email[/b]: email address used in iCloud account[/li]
+[li][b]Password[/b]: password used in iCloud account[/li]
+[li][b]IPhoneName[/b]: it is recommended to only use the SETTINGS tab to edit this field. Technically it is a COMMA (',') separated list of Apple Device name associated to iCloud account and for which you want a device in VERA.  NOTE the names are LUA pattern matching so something like "^iPhone.*" (note the caret to mark start of name) is valid and will take ALL devices whose name is starting with "iPhone".  a name of ".*" will take ALL the devices declared in your iCloud. another example is to use the real names of several devices like device1name,device2name that will work to select only these 2 devices from iCloud.
+useful patterns:
+[list]
+[li]"^iPhone.*" : all devices with names starting with iPhone[/li]
+[li]".*": all devices in the iCloud account[/li]
+[li]"iPhone of mrX,iPad of msY" : the 2 specific devices named and nothing else[/li]
+[li]"^iPhone.*,Dog's iPad" : all devices with names starting with iPhone AND the ipad called Dog's iPad[/li]
+[/list]
+In case of multiple idevices managed under a same iCloud account and since V1.63, the order in the target list box ( SETTINGS screen ) or the name list ( ADVANCED tab ) [glow=red,2,300]matters[/glow]. The [b]FIRST[/b] name in that list will be the iDevice chosen to be the root vera device, while others will be child vera devices. In the Settings page, there are 2 buttons (Up,Down) to move up or down a particular name. The name at the top of the list is the name that will be the first in the IPhoneName parameter and will be the one chosen preferably to be the root device. Changing the order in that list [b]will require[/b] a LUA reload action before the effect can be seen.
+
+[glow=red,2,300]Upgrade Considerations[/glow]: when you upgrade, or when you change the list of the IPhoneName device names, this will actually trigger the VERA child device creation logic which will sometime result in VERA deleting and recreating new devices in a different order and with different IDs. 2 notables consequences to be aware of:  [b]a)[/b] device ID are changed and other scene/plugin which uses devicesID may need to be reconfigured or updated. example PLEG or code in scenes.[b] b)[/b] the first VERA reload may trigger a second vera reload when child devices are modified, so it does take quite some time before VERA is ready, just be patient and refresh your browser when the process is over[/li]
+[li][b]PollingBase[/b]: in seconds, a duration between 2 polls to iCloud.[/li]
+[li][b]PollingAuto[/b]: 0 or 1. when 1 then the polling period is adjusted dynamically in function of the monitored device distance from its base. The exact behavior depends on your polling map. 
+[list]
+[li]PollingMap is [b]empty[/b]: The polling takes the estimated time for the device to reach its base and divide this time by the PollingDivider parameter to split it in chunks. 2 is the minimum to get accurate prediction of arrival. more will poll more and drain more battery but will give better real time tracking, so manipulate with care. when at base the [b]PollingBase [/b]will be used.[/li]
+[li]PollingMap is [b]not empty[/b]:it means you specifically want to override the default behavior and have to set your own polling / distance pairs[/li]
+[/list]
+[/li]
+[li][b]PollingMap[/b]: Enables a polling duration based on the Distance reported. The polling duration calculated is [u]the minimal of all polling required between all devices managed from this same iCloud account based on the polling map and their respective base location[/u]. if empty, dynamic polling follows a simple algorythm: if (Distance>100) the period is 10 times the based period, if Distance>10 the period is 3 times the based period.  if it is filled in, then its format is a COMMA (',') separated list of pairs like dist:polling. Number of pairs/steps is not fixed, up to you. for instance 0:600,1:60,10:300,100:1800 which would mean, if the distance is less than 1, polling will be 600s, if it is between 1 and 10, polling will be 60s, if it is between 10 and 100, polling will be 300s, if it is above 100, polling will be 1800s[/li]
+[li][b]PollingDivider [/b]variable: used to split ETA google estimation in chunks, only used in auto mode with no Polling Map[/li]
+[li][b]PollingExtra[/b]: When enabled the plugin will poll iCloud twice ( seperated by 4 secs ) in order to force iCloud to give back an accurate & recent position.[/li]
+[li][b]ETA[/b] variable to contain last reported ETA by google, or calculated ( in direct mode )[/li]
+[li][b]Version[/b]: a plugin version variable, could be useful later for upgrades[/li]
+[li][b]HomeLat HomeLong:[/b] The home base position for that device. (dd.dddddd >0 for North, <0 for South) (dd.dddddd  >0 for East, <0 for West), not every device needs to have the same home. But, the minimum distance between device and their home, for all the devices of a given iCloud account is what is taken into account to determine the polling frequency in case of "PollingAuto" mode[/li]
+[li][b]Range[/b]: tolerance distance to declare a device present or not[/li]
+[li][b]CurLat CurLong PrevLat PrevLong[/b]: The plugin Variable CurLat CurLong are the latest detected position and PrevLat PrevLong are the position just before[/li]
+[li][b]AddrFormat[/b]: 
+- it is either [b]empty [/b]( in which case it takes the json_obj.results[1].formatted_address from google API result and behaves like today )
+- or it is [b]"0"[/b] in which case this is the Privacy mode, only Present or Away status is shown but no other information like distance or address
+
+If ( and only if ) the DistanceMode value is [b]"direct"[/b] then the 2 next possibilities are offered:
+- it can be a comma seperated list of values from 1 up to 7 to take the individual elements of json_obj.results[1].address_components array from the google API result. for instance you can have "AddrFormat" = "3,5".  the Order does matter.
+- or if it [glow=red,2,300]starts with a ~ character[/glow] and the rest is a template string which contains variable names between '{' '}' like this: ~{street_number} {route},{postal_code} {locality}, {country}.   The names of variable are directly documented by google here: https://developers.google.com/maps/documentation/geocoding/?hl=fr#Types
+[/li]
+[li][b]IconCode[/b]: internal, controls which icon is displayed[/li]
+[li][b]MsgText[/b]: internal, controls the text to be shown on the UI5 dashboard[/li]
+[li][b]Muted[/b]: 1 if device is muted, 0 otherwise[/li]
+[li][b]Present[/b]: 1 if device is present, 0 otherwise. since v1.96, it will takes into account the accuracy of the metric reported by iCloud[/li]
+[li][b]HouseModeActor[/b] 1 if device participates in HouseMode calculation, 0 otherwise[/li]
+[li][b]Location[/b]: Postal address as reported by Google map address API and formatted according to "AddrFormat" variable. controls the text to be shown on the UI5 dashboard[/li]
+[li][b]LocationExtraInfo[/b]: variable that holds extra information coming from iCloud location info. format is type:accuracy:isold where type is GPS or Wifi, accuracy is the accuracy reported in meters, isold is a boolean[/li]
+[li][b]DistanceMode[/b]: selection menu in the polling SETTING tab for direct (straight line) , driving, walking or bicycling mode. Distance calculation will be done by google instead of vera and will take into account roads. Uses [b]google matrix api[/b] if the calculation mode [b]is NOT "direct"[/b]. it will call google api only once for a hierarchy of device. Default calculation mode is "direct" which keeps all code and all older calls to google, so behavior should be not changed for those who do not want to use the new driving, walking or bicycling mode[/li]
+[li][b]Distance[/b]: last distance computed for the device[/li]
+[li][b]PrevDistance[/b]: distance computed for the device at the previous polling period[/li]
+[li][b]RTSpeed[/b]: Observed realtime speed of the device in 'unit' per hour[/li]
+[li][b]LastUpdate[/b]: timestamp of last update[/li]
+[li][b]Unit[/b]: 'Mm' is statute miles, 'Km' is kilometers (default), 'Nm' is nautical miles[/li]
+[li][b]Debug[/b]: Debug mode or not, this affects ALL IPhoneLocator devices, not only this one and generates quite a number of log so, to be used only for troubleshooting purposes[/li]
+[li][b]MapUrl[/b] variable that holds the url to open that same google map in another window if wished[/li]
+[li][b]RootPrefix[/b] String used to prefix the name for the root device ( defaults to "(*)" )[/li]
+[/list]
+
+[i]Notifications[/i]
+[list]
+[li]"[b]Device is present[/b]" : When the device is present or absent, in no repeat mode[/li]
+[li]"[b]Distance is above[/b]" "[b]Distance is above[/b]" : When the distance crosses a certain threshold, in no repeat mode[/li] 
+[/list]
+
+
+[i]uPNP Actions[/i]
+[list]
+[li]action "[b]ForceRefresh[/b]" : for forcing a refresh. it will return a PresentStatus output variable (1:if device is at home). this should be testable/visible by using http://<veraip>:3480/data_request?id=lu_invoke&DeviceNum=<devicenumber>[/li]
+[li]action "[b]setMute[/b]" : for forcing a Mute so the device is not refreshing position. note that this applies to the iCloud account so in effect it will mute ALL the devices which are associated to this iCloud account[/li]
+[li]action "[b]setPresent[/b]" : for forcing a present/away state (mostly for debug)[/li]
+[li]action "[b]setDebug[/b]" : for enabling debug mode in the logs(use only for troubleshooting)[/li]
+[li]action "[b]GetMapUrl[/b]" UPNP action which returns the url to open in a browse to see a map centered on the phone position[/li]
+[/list]
+
+[i]More information about auto polling mode[/i]
+[table]
+[tr]
+[td][b]Mode[/b][/td]
+[td][b]Distance[/b][/td]
+[td][b]Speed[/b][/td]
+[td][b]Eta[/b][/td]
+[td][b]Polling[/b][/td]
+[/tr]
+[tr]
+[td]Direct[/td]
+[td]calculated from gps coordinate from the last and previous positions[/td]
+[td]calculated from ratio distance/polling. if speed is less than MIN_SPEED it is considered null.[/td]
+[td]calculated from distance/speed. if speed is null, it assumes a default speed (NOMOVE_SPEED) to make sure polling does not get too infrequent[/td]
+[td][b]With [/b]polling map: it uses the polling map, based on device distance. 
+[b]Without [/b]polling map, it takes the ETA, remove from it a default LATENCY parameter to compensate for lateness of iCloud compared to reality, divide the eta by the PollingDivider set by the user.  Then the result is normalized to allways be between a MIN_PERIOD and MAX_PERIOD. [/td]
+[/tr]
+[tr]
+[td]Driving, Bicycling, Walking[/td]
+[td]Received from Google Matrix API[/td]
+[td]same as above.[/td]
+[td]ETA is not calculated, it is simply received from the google matrix API and therefore is subject to google calculation and estimation what your speed is based on the mode you selected.[/td]
+[td]same as above.[/td]
+[/tr]
+[/table]
+
+[code]
+local MIN_PERIOD = 10        -- poll cannot be less than this in sec
+local MAX_PERIOD = 3600   -- poll cannot be more than this in sec
+local ETA_LATENCY = 30      -- ETA Latency, removes this from ETA to compensate for iCloud latency
+local MIN_SPEED = 5/3600   -- 5km/h (in km/s)
+local NOMOVE_SPEED = 60/3600  - in km/s, when speed is null or <Min
+[/code]
+
+[i]Considerations for multiple devices in a single iCloud account[/i]
+[list]
+[li]Child devices:  one device holds the iCloud relation and polling activity for all the apple devices. So there is a parent device in VERA and child devices. Since most users have only one device, the parent device is also used for the first iCloud device. if you have more than one device in your iCloud account and if the iPhoneName pattern selects more than one, additional child devices will be created as needed. the Child device do not have all the properties of the parent device because they do not need things email/pwd etc as they do not connect to iCloud themselves. To give a user hint to which device is the master device, its name is preceeded by a (*) sign in its Name blue bar[/li]
+[li]IPhoneName: chose which of your iCloud devices you want location reporting. using comma seperated list of names, and LUA pattern matching. in fact it is a comma seperated list of lua pattern matching because lua does not seem to support "OR" between patterns so the comma effectively enables to perform an "OR"[/li]
+[li]Mute: a Mute command is reflected back to the parent device managing the iCloud account. so Muting a device, mutes all devices for a given iCloud account[/li]
+[li]Refresh: a Refresh command is reflected back to the parent device managing the iCloud account. so Muting a device, mutes all devices for a given iCloud account[/li]
+[li]Dynamic Polling: enables to chose a polling duration based on the distance of the device, but the Polling considered is [u]the minimal of all required polling between all devices managed from this same iCloud account[/u][/li]
+[/list]
+
+[i]Considerations for UI7 HouseModes[/i]
+[list]
+[li]Only devices with the [b]HouseModeActor[/b] variable set to 1 will participate in the HouseMode status determination. by default a device DOES NOT participate.[/li]
+[li]if all participating devices are away, and mode is home or night then HouseMode is set to away  ( meaning vacation is ignored & unchanged )[/li]
+[li]if 1 participating device is present, and mode is away then  HouseMode is set to home ( meaning vacation or night is ignored & left unchanged )[/li]
+[/list]
+Enjoy...

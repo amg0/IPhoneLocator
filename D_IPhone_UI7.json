@@ -1,0 +1,544 @@
+{
+    "flashicon": "http://code.mios.com/trac/mios_iphone-detector/export/242/trunk/iPhoneLocator/iconIPhone.png",
+    "default_icon": "http://code.mios.com/trac/mios_iphone-detector/export/242/trunk/iPhoneLocator/iconIPhone.png",
+    "halloIconsDir": "pics\/hallo",
+    "state_icons": [
+        "iconIPhone_0.png",
+        "iconIPhone_25.png",
+        "iconIPhone_50.png",
+        "iconIPhone_75.png",
+        "iconIPhone_100.png",
+        {
+            "img": "..\/..\/..\/icons\/iconIPhone_0.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                    "variable": "IconCode",
+                    "operator": "==",
+                    "value": 0
+                }
+            ]
+        },
+        {
+            "img": "..\/..\/..\/icons\/iconIPhone_25.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                    "variable": "IconCode",
+                    "operator": "==",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "img": "..\/..\/..\/icons\/iconIPhone_50.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                    "variable": "IconCode",
+                    "operator": "==",
+                    "value": 50
+                }
+            ]
+        },
+        {
+            "img": "..\/..\/..\/icons\/iconIPhone_75.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                    "variable": "IconCode",
+                    "operator": "==",
+                    "value": 75
+                }
+            ]
+        },
+        {
+            "img": "..\/..\/..\/icons\/iconIPhone_100.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                    "variable": "IconCode",
+                    "operator": "==",
+                    "value": 100
+                }
+            ]
+        }
+    ],
+    "x": "2",
+    "y": "4",
+    "inScene": "1",
+    "ToggleButton": 0,
+    "DisplayStatus": {
+        "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+        "Variable": "IconCode",
+        "MinValue": "0",
+        "MaxValue": "100"
+    },
+    "doc_url": {
+        "doc_language": 1,
+        "doc_manual": 1,
+        "doc_version": 1,
+        "doc_platform": 0,
+        "doc_page": "",
+        "doc_forced_url": {
+            "text": "http:\/\/forum.micasaverde.com\/index.php\/topic,16907.0.html"
+        }
+    },
+
+    "Tabs": [
+        {
+            "Label": {
+                "lang_tag": "tabname_control",
+                "text": "Control"
+            },
+            "Position": "0",
+            "TabType": "flash",
+			"TopNavigationTab": "1",
+            "top_navigation_tab": 1,
+            "SceneGroup": [
+                {
+                    "id": "1",
+                    "top": "0",
+                    "left": "0",
+                    "x": "3",
+                    "y": "7"
+                }
+            ],
+            "ControlGroup": [
+                {
+                    "id": "1",
+                    "isSingle": "1",
+                    "scenegroup": "1"
+                }
+            ],
+
+            "Control": [
+                {
+                    "ControlGroup": "1",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "0",
+                    "Label": {
+                        "lang_tag": "force_refresh",
+                        "text": "Refresh"
+                    },
+                    "Display": {
+                        "Value": "1",
+                        "Top": 170,
+                        "Left": 50,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                        "Action": "ForceRefresh",
+                        "Parameters": []
+                    }
+                },
+                {
+                    "ControlGroup": "1",
+                    "ControlType": "multi_state_button",
+                    "top": "0",
+                    "left": "0",
+                    "Display": {
+                        "Top": 0,
+                        "Left": 0
+                    },
+                    "states":
+                    [
+                        {
+                            "Label": {
+                                "lang_tag": "presence_on",
+                                "text": "Present"
+                            },
+                            "ControlGroup": "1",
+                            "Display": {
+                                "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                                "Variable": "Present",
+                                "Value": "1"
+                            },
+                            "Command": {
+                                "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                                "Action": "SetPresent",
+                                "Parameters": [
+                                    {
+                                        "Name": "newPresentStatus",
+                                        "Value": "1"
+                                    }
+                                ]
+                            },
+                            "ControlCode": "presence_on"
+                        },
+                        {
+                            "Label": {
+                                "lang_tag": "presence_off",
+                                "text": "Away"
+                            },
+                            "ControlGroup": "1",
+                            "Display": {
+                                "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                                "Variable": "Present",
+                                "Value": "0"
+                            },
+                            "Command": {
+                                "Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+                                "Action": "SetPresent",
+                                "Parameters": [
+                                    {
+                                        "Name": "newPresentStatus",
+                                        "Value": "0"
+                                    }
+                                ]
+                            },
+                            "ControlCode": "presence_off"
+                        }
+                    ]
+				},
+				{
+					"ControlGroup": "1",
+					"ControlType": "multi_state_button",
+					"top": "0",
+					"left": "2",
+					"Display": {
+						"Top": 0,
+						"Left": 80
+					},
+					"states": [
+						{
+							"Label": {
+								"lang_tag": "mute_on",
+								"text": "Muted"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Variable": "Muted",
+								"Value": "1"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Action": "SetMute",
+								"Parameters": [
+									{
+										"Name": "newMuteStatus",
+										"Value": "1"
+									}
+								]
+							},
+							"ControlCode": "mute_on"
+						},
+						{
+							"Label": {
+								"lang_tag": "mute_off",
+								"text": "Unmuted"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Variable": "Muted",
+								"Value": "0"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Action": "SetMute",
+								"Parameters": [
+									{
+										"Name": "newMuteStatus",
+										"Value": "0"
+									}
+								]
+							},
+							"ControlCode": "mute_off"
+						}
+					]
+				},
+				{
+					"ControlType": "multi_state_button",
+					"top": "0",
+					"left": "3",
+					"Display": {
+						"Top": 0,
+						"Left": 160
+					},
+					"states": [
+						{
+							"Label": {
+								"lang_tag": "debug_on",
+								"text": "Debug"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Variable": "Debug",
+								"Value": "1"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Action": "SetDebug",
+								"Parameters": [
+									{
+										"Name": "newDebugMode",
+										"Value": "1"
+									}
+								]
+							},
+							"ControlCode": "debug_on"
+						},
+						{
+							"Label": {
+								"lang_tag": "debug_off",
+								"text": "UnDebug"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Variable": "Debug",
+								"Value": "0"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+								"Action": "SetDebug",
+								"Parameters": [
+									{
+										"Name": "newDebugMode",
+										"Value": "0"
+									}
+								]
+							},
+							"ControlCode": "debug_off"
+						}
+					]
+				},
+				{
+					"ControlGroup": "1",
+					"ControlType": "variable",
+					"top": "3",
+					"left": "0",
+					"x": "4",
+					"text_align": "left",
+					"Display": {
+						"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+						"Variable": "Location",
+						"Top": 61,
+						"Left": 10,
+						"Width": 100,
+						"Height": 20
+					}
+				},
+				{
+					"ControlGroup": "1",
+					"ControlType": "variable",
+					"top": "4",
+					"left": "0",
+					"x": "4",
+					"text_align": "left",
+					"Display": {
+						"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+						"Variable": "MsgText",
+						"Top": 81,
+						"Left": 10,
+						"Width": 100,
+						"Height": 20
+					}
+				},
+				{
+					"ControlGroup": "1",
+					"ControlType": "variable",
+					"top": "5",
+					"left": "0",
+					"x": "4",
+					"text_align": "left",
+					"Display": {
+						"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+						"Variable": "MsgText2",
+						"Top": 101,
+						"Left": 10,
+						"Width": 100,
+						"Height": 20
+					}
+				},
+				{
+					"ControlGroup": "1",
+					"ControlType": "variable",
+					"top": "5",
+					"left": "3",
+					"x": "1",
+					"text_align": "right",
+					"Display": {
+						"Service": "urn:upnp-org:serviceId:IPhoneLocator1",
+						"Variable": "Version",
+						"Top": 121,
+						"Left": 10,
+						"Width": 50,
+						"Height": 20
+					}
+				}
+			]
+	},
+	{
+		"Label": {
+			"lang_tag": "settings",
+			"text": "Settings"
+		},
+		"TopNavigationTab": "1",
+		"Position": "1",
+		"TabType": "javascript",
+		"ScriptName": "J_IPhone.js",
+		"Function": "iphone_Settings"
+	},
+	{
+		"Label": {
+			"lang_tag": "map",
+			"text": "Map"
+		},
+		"Position": "2",
+		"TopNavigationTab": "1",
+		"TabType": "javascript",
+		"ScriptName": "J_IPhone.js",
+		"Function": "iphone_Map"
+	},
+	{
+      "Label": {
+        "lang_tag": "advanced",
+        "text": "Advanced"
+      },
+      "Position": "3",
+      "TabType": "javascript",
+      "ScriptName": "shared.js",
+      "Function": "advanced_device"
+    },
+	{
+		"Label": {
+			"lang_tag": "ui7_logs",
+			"text": "Logs"
+		},
+		"Position": "4",
+		"TabType": "javascript",
+		"ScriptName": "shared.js",
+		"Function": "device_logs"
+	},
+	{
+		"Label": {
+			"lang_tag": "ui7_notifications",
+			"text": "Notifications"
+		},
+		"Position": "5",
+		"TabType": "javascript",
+		"ScriptName": "shared.js",
+		"Function": "device_notifications"
+	},
+	{
+		"Label": {
+			"lang_tag": "ui7_device_scenes",
+			"text": "Scenes"
+		},
+		"Position": "6",
+		"TabType": "javascript",
+		"ScriptName": "shared.js",
+		"Function": "device_scenes"
+	}
+  ],
+  "sceneList": {
+  },
+  "eventList":{
+  },
+  "eventList2": [
+    {
+      "id": 1,
+      "label": {
+        "lang_tag": "a_device_is_present_or_away",
+        "text": "A device is present or away"
+      },
+      "serviceId": "urn:upnp-org:serviceId:IPhoneLocator1",
+	  "norepeat": "1",
+      "argumentList": [
+        {
+          "id": 1,
+          "dataType": "boolean",
+          "defaultValue": "1",
+          "allowedValueList": [
+            {
+              "Off": "0",
+              "HumanFriendlyText": {
+                "lang_tag": "hft_device_away",
+                "text": "_DEVICE_NAME_ is away"
+              }
+            },
+            {
+              "On": "1",
+              "HumanFriendlyText": {
+                "lang_tag": "hft_device_present",
+                "text": "_DEVICE_NAME_ is present"
+              }
+            }
+          ],
+          "name": "Present",
+          "comparisson": "=",
+          "prefix": {
+            "lang_tag": "which_mode",
+            "text": "Which mode"
+          },
+          "suffix": {
+            
+          }
+        }
+      ]
+    },
+	{
+		"id": 2,
+		"label": {
+			"lang_tag": "distance_goes_below",
+			"text": "Distance goes below"
+		},
+		"serviceId": "urn:upnp-org:serviceId:IPhoneLocator1",
+		"norepeat": "1",
+		"argumentList": [
+			{
+				"id": 1,
+				"dataType": "float",
+				"name": "Distance",
+				"comparisson": "<",
+				"prefix": {
+					"lang_tag": "distance",
+					"text": "Distance"
+				},
+				"suffix": {
+				},
+				"HumanFriendlyText": {
+					"lang_tag": "hft_distance_goes_below",
+					"text": "_DEVICE_NAME_ distance goes below _ARGUMENT_VALUE_ unit"
+				}
+			}
+		]
+	},
+	{
+		"id": 3,
+		"label": {
+			"lang_tag": "distance_goes_above",
+			"text": "Distance goes above"
+		},
+		"serviceId": "urn:upnp-org:serviceId:IPhoneLocator1",
+		"norepeat": "1",
+		"argumentList": [
+			{
+				"id": 1,
+				"dataType": "float",
+				"name": "Distance",
+				"comparisson": ">",
+				"prefix": {
+					"lang_tag": "distance",
+					"text": "Distance"
+				},
+				"suffix": {
+				},
+				"HumanFriendlyText": {
+					"lang_tag": "hft_distance_goes_above",
+					"text": "_DEVICE_NAME_ distance goes above _ARGUMENT_VALUE_ unit"
+				}
+			}
+		]
+	}
+  ],
+  "DeviceType": "urn:schemas-upnp-org:device:IPhoneLocator:1",
+  "device_type": "urn:schemas-upnp-org:device:IPhoneLocator:1"
+}

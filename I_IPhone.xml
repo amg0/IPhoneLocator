@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<implementation>
+  <functions>
+  </functions>
+  <files>L_IPhone.lua</files>
+  <startup>initstatus</startup>
+  <actionList>
+  	<action>
+	 <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+	 <name>SetMute</name>
+	  <job>
+		setMute(lul_device,lul_settings.newMuteStatus)
+		return 4,0
+	  </job>
+	</action>
+	<action>
+	 <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+	 <name>SetPresent</name>
+	  <job>
+		setPresent(lul_device,lul_settings.newPresentStatus)
+		return 4,0
+	  </job>
+	</action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+      <name>GetPresent</name>
+      <run>
+        luup.variable_get(service, "Present", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+      <name>GetLocation</name>
+      <run>
+        luup.variable_get(service, "Location", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+      <name>GetDistance</name>
+      <run>
+        luup.variable_get(service, "Distance", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+      <name>ForceRefresh</name>
+      <job>
+		luup.call_delay("restartDevice", 2, tostring(lul_device))		
+		lul_settings.PresentStatus = luup.variable_get(service, "Present", lul_device)
+		return 4,0
+      </job>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+      <name>GetMapUrl</name>
+      <run>
+        getsetMapUrl(lul_device)
+      </run>
+    </action>
+	<action>
+	 <serviceId>urn:upnp-org:serviceId:IPhoneLocator1</serviceId>
+	 <name>SetDebug</name>
+	  <run>
+			setDebugMode(lul_device,lul_settings.newDebugMode)
+	  </run>
+	</action>
+	</actionList>
+</implementation>
