@@ -84,6 +84,24 @@ end
 -- VERA System Utils
 ------------------------------------------------
 
+local function getSetVariable(serviceId, name, deviceId, default)
+	local curValue = luup.variable_get(serviceId, name, deviceId)
+	if (curValue == nil) then
+		curValue = default
+		luup.variable_set(serviceId, name, curValue, deviceId)
+	end
+	return curValue
+end
+
+local function setVariableIfChanged(serviceId, name, value, deviceId)
+	debug(string.format("setVariableIfChanged(%s,%s,%s,%s)",serviceId, name, value, deviceId))
+	local curValue = luup.variable_get(serviceId, name, deviceId) or ""
+	value = value or ""
+	if (tostring(curValue)~=tostring(value)) then
+		luup.variable_set(serviceId, name, value, deviceId)
+	end
+end
+
 local function getIP()
 	-- local stdout = io.popen("GetNetworkState.sh ip_wan")
 	-- local ip = stdout:read("*a")
@@ -114,17 +132,17 @@ end
 
 local function getAmbiantLanguage(lul_device)
 	--http://192.168.1.5/cgi-bin/cmh/sysinfo.sh
-	log(string.format("getAmbiantLanguage(%s)",lul_device))
-	if (ambiantLanguage=="") then
-		local obj = getSysinfo( getIP() )
-		if (obj~=nil) then
-			debug("language="..obj.ui_language)
-			ambiantLanguage = obj.ui_language
-		else
-			ambiantLanguage = "en"
-		end
-	end
-	return ambiantLanguage
+	-- log(string.format("getAmbiantLanguage(%s)",lul_device))
+	-- if (ambiantLanguage=="") then
+		-- local obj = getSysinfo( getIP() )
+		-- if (obj~=nil) then
+			-- debug("language="..obj.ui_language)
+			-- ambiantLanguage = obj.ui_language
+		-- else
+			-- ambiantLanguage = "en"
+		-- end
+	-- end
+	return getSetVariable(service, "UILanguage", lul_device, "en") --ambiantLanguage
 end
 
 -- 1 = Home
@@ -318,24 +336,6 @@ end
 ------------------------------------------------
 -- Device Properties Utils
 ------------------------------------------------
-
-local function getSetVariable(serviceId, name, deviceId, default)
-	local curValue = luup.variable_get(serviceId, name, deviceId)
-	if (curValue == nil) then
-		curValue = default
-		luup.variable_set(serviceId, name, curValue, deviceId)
-	end
-	return curValue
-end
-
-local function setVariableIfChanged(serviceId, name, value, deviceId)
-	debug(string.format("setVariableIfChanged(%s,%s,%s,%s)",serviceId, name, value, deviceId))
-	local curValue = luup.variable_get(serviceId, name, deviceId) or ""
-	value = value or ""
-	if (tostring(curValue)~=tostring(value)) then
-		luup.variable_set(serviceId, name, value, deviceId)
-	end
-end
 
 -- getDistance(d) : in (km or nm or m) 
 function getDistance(lul_device)

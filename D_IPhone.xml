@@ -8,7 +8,7 @@
     <deviceType>urn:schemas-upnp-org:device:IPhoneLocator:1</deviceType>
     <staticJson>D_IPhone.json</staticJson> 
     <friendlyName>IPhoneLocator</friendlyName>
-    <manufacturer>Amg</manufacturer>
+    <manufacturer>Amg0</manufacturer>
     <manufacturerURL></manufacturerURL>
     <modelDescription>IPhoneLocator</modelDescription>
     <modelName>IPhoneLocator</modelName>

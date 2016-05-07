@@ -3,6 +3,11 @@ Initial help topic is getting too big, so I am putting a version change log here
 Latest version doc : [url=http://forum.micasaverde.com/index.php/topic,16907.msg130221.html#msg130221]http://forum.micasaverde.com/index.php/topic,16907.msg130221.html#msg130221[/url]
 
 [i]Change Log[/i]
+[b]Version 2.34 [/b]
+[list]
+[li]openLuup compatibility[/li]
+[li]UILanguage value to set plugin language ( en, fr etc... ) [/li]
+[/list]
 [b]Version 2.3 [/b]
 [list]
 [li]use UI7 Top bar for plugin setting pages[/li]
