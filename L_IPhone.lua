@@ -251,7 +251,8 @@ end
 -- Escape quote characters (for string comp)
 ------------------------------------------------
 function escapeQuotes( str )
-		return str:gsub("\'", "\\'"):gsub("\?", '\\?'):gsub('\"','\\"') -- escape quote characters
+	return str:gsub("'", "\\'"):gsub("?", '\\%?'):gsub('"','\\"') -- escape quote characters
+	-- return str:gsub("\'", "\\'"):gsub("\?", '\\?'):gsub('\"','\\"') -- escape quote characters
 end
 
 -- example: iterateTbl( t , luup.log )
@@ -661,7 +662,7 @@ function getAppleDeviceMap(username, password, pollingextra)
 			debug("***Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
 		end
 	else
-		UserMessage("failed to call fmipservice\/device",TASK_ERROR_PERM)	
+		UserMessage("failed to call fmipservice device",TASK_ERROR_PERM)	
 	end
 	return nil
 end
@@ -1476,27 +1477,6 @@ function createChildDevices(lul_device)
 	
 end
 	
--- function unitTestPassword()
-	-- local pwd = {
-		-- "abcdefgh",
-		-- "abcde!:/.;?fgh*%",
-		-- "abcde,#{[|`\^@",
-		-- "abcde\'ghi\"ljl",
-		-- "^çé&#àà@$£§ù"
-		-- }
-	-- for k,v in pairs(pwd) do
-		-- local enc1 = iPhoneEnc.Encrypt(v)
-		-- local enc2 = mime.b64(enc1)
-		-- local res1 = mime.unb64(enc2)
-		-- local res2 = iPhoneEnc.Decrypt(res1)
-		-- if (res2==v) then
-			-- log(string.format("Success: %s : %s : %s : %s : %s",v,enc1,enc2,res1,res2))
-		-- else
-			-- log(string.format("Failure: %s : %s : %s : %s : %s",v,enc1,enc2,res1,res2))
-		-- end
-	-- end
--- end
-
 function startupDeferred(lul_device)
 	lul_device = tonumber(lul_device)
 	log("startupDeferred, called on behalf of device:"..lul_device)
