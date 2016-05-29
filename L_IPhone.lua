@@ -9,7 +9,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.34"
+local version = "v2.37"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -177,15 +177,19 @@ end
 ------------------------------------------------
 -- Check UI7
 ------------------------------------------------
-local function checkVersion()
+local function checkVersion(lug_device)
+	-- log(string.format("IPhone : checking if we run on UI7"))
 	local ui7Check = luup.variable_get(service, "UI7Check", lug_device) or ""
+	-- log(string.format("IPhone : ui7Check : %s",ui7Check))
 	if ui7Check == "" then
 		luup.variable_set(service, "UI7Check", "false", lug_device)
 		ui7Check = "false"
 	end
+	-- log(string.format("IPhone : ui7Check : %s",ui7Check))
 	if( luup.version_branch == 1 and luup.version_major == 7 and ui7Check == "false") then
 		luup.variable_set(service, "UI7Check", "true", lug_device)
 		luup.attr_set("device_json", UI7_JSON_FILE, lug_device)
+		-- log(string.format("IPhone : setting  UI7 json file and reloading"))
 		luup.reload()
 	end
 end
@@ -252,7 +256,6 @@ end
 ------------------------------------------------
 function escapeQuotes( str )
 	return str:gsub("'", "\\'"):gsub("?", '\\%?'):gsub('"','\\"') -- escape quote characters
-	-- return str:gsub("\'", "\\'"):gsub("\?", '\\?'):gsub('\"','\\"') -- escape quote characters
 end
 
 -- example: iterateTbl( t , luup.log )
@@ -1715,7 +1718,7 @@ end
 function initstatus(lul_device)
 	lul_device = tonumber(lul_device)
 	UserMessage("starting version "..version.." lul_device:"..lul_device)
-	checkVersion()
+	checkVersion(lul_device)
 	local delay = 2	-- delaying first refresh by x seconds
 
 	if (getParent(lul_device)==0) then
