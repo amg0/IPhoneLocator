@@ -1,4 +1,4 @@
-//@ sourceURL=J_Phone.js
+//# sourceURL=J_Phone.js
 // for dynamic loaded script to appear in google debugger
 var iphone_Svs = 'urn:upnp-org:serviceId:IPhoneLocator1';
 var googleMap_refresh = 4000;
