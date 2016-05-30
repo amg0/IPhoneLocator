@@ -9,7 +9,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.37"
+local version = "v2.38"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -23,6 +23,15 @@ local NOMOVE_SPEED = 60/3600				-- in km / s, when speed is null or <Min, taking
 local MAP_URL = "http://maps.google.com/?q={0}@{1},{2}"	-- {0}:name {1}:lat {2}:long
 local ambiantLanguage = ""							-- Ambiant Language
 local DEFAULT_ROOT_PREFIX = "(*)"
+
+------------------------------------------------
+-- Tasks
+------------------------------------------------
+local taskHandle = -1
+local TASK_ERROR = 2
+local TASK_ERROR_PERM = -2
+local TASK_SUCCESS = 4
+local TASK_BUSY = 1
 
 --calling a function from HTTP in the device context
 --http://192.168.1.5/port_3480/data_request?id=lu_action&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&action=RunLua&DeviceNum=81&Code=getMapUrl(81)
@@ -197,11 +206,6 @@ end
 ------------------------------------------------
 -- Tasks
 ------------------------------------------------
-local taskHandle = -1
-local TASK_ERROR = 2
-local TASK_ERROR_PERM = -2
-local TASK_SUCCESS = 4
-local TASK_BUSY = 1
 
 --
 -- Has to be "non-local" in order for MiOS to call it :(
@@ -343,14 +347,14 @@ end
 
 -- getDistance(d) : in (km or nm or m) 
 function getDistance(lul_device)
-	Distance = luup.variable_get(service,"Distance", lul_device)
+	local Distance = luup.variable_get(service,"Distance", lul_device)
 	Distance = tonumber(Distance or 0)
 	return Distance
 end
 
 -- getPresent(d) : 0 or 1
 function getPresent(lul_device)
-	Present = luup.variable_get(service,"Present", lul_device) 
+	local Present = luup.variable_get(service,"Present", lul_device) 
 	Present = tonumber(Present or 0)
 	return Present
 end
@@ -396,6 +400,7 @@ function switch( command, actiontable)
 end
 
 function myIPhone_Handler(lul_request, lul_parameters, lul_outputformat)
+	local command=''
 	log('myIPhone_Handler: request is: '..tostring(lul_request))
 	for k,v in pairs(lul_parameters) do debug ('myIPhone_Handler: parameters are: '..tostring(k)..'='..tostring(v)) end
 	debug('myIPhone_Handler: outputformat is: '..tostring(lul_outputformat))
@@ -493,7 +498,8 @@ this function is from: GeoDataSource.com (C) All Rights Reserved 2013
 -- end
 -- Updated code from @duiffie , http://forum.micasaverde.com/index.php/topic,16907.msg136038.html#msg136038
 function distanceBetween(lat1, lon1, lat2, lon2, distance_unit)
-        local R = 6378.137
+        local dist
+		local R = 6378.137
         local dLat = (lat2 - lat1) * math.pi / 180
         local dLon = (lon2 - lon1) * math.pi / 180
         local a = math.sin(dLat/2) * math.sin(dLat/2) +
@@ -654,7 +660,7 @@ function getAppleDeviceMap(username, password, pollingextra)
 			--
 			-- stage2 : get server name and continue the process
 			--
-			stage2server=headers["x-apple-mme-host"]
+			local stage2server=headers["x-apple-mme-host"]
 			local contentobj = getAppleStage2(stage2server,username,commonheaders,pollingextra)
 			if (contentobj ~= nil) then
 				return contentobj	-- can be nil in case of error
@@ -982,7 +988,7 @@ function setMute(lul_device,newMuteStatus)
 	lul_device = tonumber(lul_device)
 
 	--  update root & update each children
-	root_device = getRoot(lul_device)
+	local root_device = getRoot(lul_device)
 	local muted = luup.variable_get(service,"Muted", root_device)
 	if (muted ~= newMuteStatus) then
 		updateMuteIcon(root_device, newMuteStatus)
@@ -1025,7 +1031,7 @@ function whichVeraDeviceToUpdate(appledevicename,lul_device)
 	-- if (appledevicename==luup.attr_get ('id', lul_device)) then
 		-- return lul_device
 	-- end
-	child_device = findChild( prefix..appledevicename )
+	local child_device = findChild( prefix..appledevicename )
 	if (child_device~=nil) then
 		return child_device
 	end
@@ -1218,8 +1224,8 @@ function getPeriodForDistanceAndMap( period, distance, pollingMap )
 	debug("Polling map: "..json.encode(tbl))
 	for i,v in pairs(tbl) do 	
 		local distandpoll = v:split(":")	
-		distmin = distandpoll[1]+0	-- convert to number
-		periodmin= tonumber(distandpoll[2])
+		local distmin = distandpoll[1]+0	-- convert to number
+		local periodmin= tonumber(distandpoll[2])
 		if (distance>=distmin) then
 			period = periodmin
 		else
@@ -1232,7 +1238,7 @@ end
 function getPeriodForDevice(lul_device)
 	local distance=getDistance(lul_device)
 	
-	root  = getRoot(lul_device)
+	local root  = getRoot(lul_device)
 	local base = luup.variable_get(service,"PollingBase", root)
 	base = tonumber(base)
 	local period = base
