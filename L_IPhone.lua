@@ -9,7 +9,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.38"
+local version = "v2.39"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -260,6 +260,9 @@ end
 ------------------------------------------------
 function escapeQuotes( str )
 	return str:gsub("'", "\\'"):gsub("?", '\\%?'):gsub('"','\\"') -- escape quote characters
+end
+function escapePattern(str)
+	return escapeQuotes( str )
 end
 
 -- example: iterateTbl( t , luup.log )
@@ -943,9 +946,9 @@ end
 
 function deviceShouldBeReported(name, pattern)
 	-- Pattern is a CSV list of LUA patterns
-	debug("iCloud device detected:"..name.." pattern:"..pattern)
-	name = escapeQuotes(name)
-	pattern= escapeQuotes(pattern)
+	log("iCloud device detected:"..name.." pattern:"..pattern)
+	-- name = escapeQuotes(name)
+	-- pattern= escapePattern(pattern)
 	--debug("ESCAPED versions -->iCloud device detected:"..name.." pattern:"..pattern)
 	local tblpattern = pattern:split(",")
 	for key,value in pairs(tblpattern) do
@@ -955,7 +958,7 @@ function deviceShouldBeReported(name, pattern)
 			return name
 		end
 	end
-	log("iCloud device ignored, name:"..name.." pattern:"..pattern)
+	debug("iCloud device ignored, name:"..name.." pattern:"..pattern)
 	return nil
 end
 

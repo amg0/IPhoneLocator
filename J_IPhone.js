@@ -26,7 +26,15 @@ if (typeof String.prototype.format == 'undefined') {
 function isFunction(x) {
   return Object.prototype.toString.call(x) == '[object Function]';
 }
-
+function escapeLuaPattern(val) {
+	var result="";
+	var chars = "( ) . % + - * ? ["; //^ $
+	jQuery.each(chars.split(" "),function(idx,c) {
+		esc_c = c.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+		val = val.replace( new RegExp(esc_c, 'g'),'%'+c);
+	});
+	return val;
+}
 function rgb2hex(r, g, b) {
 	return "#" + (65536 * r + 256 * g + b).toString(16);
 }
@@ -468,9 +476,11 @@ function initializeAppleNames( deviceID ) {
 	return applenames;
 }
 
-function addOptionToTarget(value)
+function addOptionToTarget(value,bEscape)
 {
 	if (value!='') {
+		if (bEscape!==false)
+			value = escapeLuaPattern(value);
 		var option = new Option(value, value); 
 		jQuery('#iphone_NameTarget').append(option);
 	}
@@ -742,7 +752,7 @@ function iphone_Settings(deviceID) {
 
 		// and initialize the target list from the names already saved in the device
 		jQuery.each( name.split(','), function( index,value) {
-			addOptionToTarget(value);
+			addOptionToTarget(value,false);
 		});
 	
 		// click  handler to get pattern value and add it to target names 
