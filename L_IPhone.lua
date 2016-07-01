@@ -9,7 +9,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.39"
+local version = "v2.40"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -304,10 +304,12 @@ end
 -- a) the index === the device ID
 -- b) the device itself luup.devices[id]
 -----------------------------------
-function findChild( altid )
+function findChild( parent, altid )
 	for k,v in pairs(luup.devices) do
-		if( v.id==altid) then
-			return k,v
+		if( getParent(k)==parent) then
+			if( v.id==altid) then
+				return k,v
+			end
 		end
 	end
 	return nil,nil
@@ -1034,7 +1036,7 @@ function whichVeraDeviceToUpdate(appledevicename,lul_device)
 	-- if (appledevicename==luup.attr_get ('id', lul_device)) then
 		-- return lul_device
 	-- end
-	local child_device = findChild( prefix..appledevicename )
+	local child_device = findChild( lul_device, prefix..appledevicename )
 	if (child_device~=nil) then
 		return child_device
 	end
@@ -1442,7 +1444,11 @@ function createChildDevices(lul_device)
 						-- do not create a child for the first device, we use our own top device
 						-- this is better for people who have only once device to report
 					firstdevice=value.name		
-					luup.attr_set ('name', rootprefix..devicename, lul_device)
+					luup.variable_set(service, "ICloudName", value.name, lul_device)
+					local attrname = luup.attr_get ('name', lul_device)
+					if (attrname=="") then
+						luup.attr_set ('name', rootprefix..devicename, lul_device)
+					end
 					break
 				end
 			end
@@ -1458,18 +1464,31 @@ function createChildDevices(lul_device)
 						-- do not create a child for the first device, we use our own top device
 						-- this is better for people who have only once device to report
 						firstdevice=value.name		
-						luup.attr_set ('name', rootprefix..devicename, lul_device)
-
+						luup.variable_set(service, "ICloudName", devicename, lul_device)
+						local attrname = luup.attr_get ('name', lul_device)
+						if (attrname=="") then
+							luup.attr_set ('name', devicename, lul_device)
+						end
 					else
-						luup.chdev.append(
-							lul_device, handle, 		-- parent device and handle
-							prefix..devicename, devicename, 		-- id and description
-							devicetype, 	-- device type
-							"D_IPhone.xml", "I_IPhone.xml", -- device filename and implementation filename
-							params, 						-- uPNP child device parameters: "service,variable=value\nservice..."
-							true,							-- embedded
-							false							-- invisible
-							)
+						local newparams = params..string.format("\n%s,ICloudName=%s",service,devicename)
+						-- local child,childdevice = findChild( lul_device, prefix..devicename )
+						-- if (child ~= nil) then
+							-- luup.variable_set(service, "ICloudName", devicename, child)
+							-- local attrname = luup.attr_get ('name', child)
+							-- if (attrname:trim()=="") then
+								-- luup.attr_set ('name', devicename, child)
+							-- end
+						-- else
+							luup.chdev.append(
+								lul_device, handle, 		-- parent device and handle
+								prefix..devicename, devicename, 		-- id and description
+								devicetype, 	-- device type
+								"D_IPhone.xml", "I_IPhone.xml", -- device filename and implementation filename
+								newparams, 						-- uPNP child device parameters: "service,variable=value\nservice..."
+								true,							-- embedded
+								false							-- invisible
+								)
+						-- end
 					end
 				else
 					debug(string.format("no matching device, value.name:%s pattern:%s no match",value.name,pattern))
@@ -1478,6 +1497,7 @@ function createChildDevices(lul_device)
 		end
 		if (firstdevice==nil) then
 			luup.attr_set ('name', "Not Configured", lul_device)
+			luup.variable_set(service, "ICloudName", "Not Configured", lul_device)
 		end
 		luup.chdev.sync(lul_device, handle)
 	end
@@ -1623,6 +1643,7 @@ function startupDeferred(lul_device)
 	luup.variable_set(service,"RTSpeed",0,lul_device)
 	luup.variable_set(service,"Version",version,lul_device)
 	getSetVariable(service, "HouseModeActor", lul_device, "0")	-- by default, does not participate in HouseMode Calculation
+	getSetVariable(service, "ICloudName", lul_device, "")	    
 	
 	local iconcode = luup.variable_get(service,"IconCode", lul_device)
 	if (iconcode==nil) or (iconcode=="") then
