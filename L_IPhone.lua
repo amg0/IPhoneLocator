@@ -9,7 +9,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.40"
+local version = "v2.41"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -662,13 +662,22 @@ function getAppleDeviceMap(username, password, pollingextra)
 	if (response==1) then
 		if (status==330) then
 			debug("*** after send stage1. Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
-			--
+
 			-- stage2 : get server name and continue the process
-			--
 			local stage2server=headers["x-apple-mme-host"]
 			local contentobj = getAppleStage2(stage2server,username,commonheaders,pollingextra)
 			if (contentobj ~= nil) then
 				return contentobj	-- can be nil in case of error
+			end
+			UserMessage("Bad response from https://" .. stage2server .. "/fmipservice/device/" .. username .."/initClient")
+		elseif (status==200) then
+			-- no need for stage2 : change from iCloud since Jan 10 2017
+			debug("*** after send stage1. Status 200 Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
+			debug("***Response Body=" .. table.concat(response_body) )	
+			local completestring = table.concat(response_body)
+			local obj = json.decode(completestring)
+			if (obj.content ~= nil) then
+				return obj.content	-- can be nil in case of error
 			end
 			UserMessage("Bad response from https://" .. stage2server .. "/fmipservice/device/" .. username .."/initClient")
 		else
