@@ -1,5 +1,9 @@
 local mime = require('mime')
-local json = require('L_IPhoneJson')		-- or json_dm for those who use Dataminer plugin
+local json = require("dkjson")
+if (type(json) == "string") then
+	luup.log("ALTUI warning dkjson missing, falling back to L_IPhoneJson", 2)
+	json = require("L_IPhoneJson")
+end
 local iPhoneEnc = require('L_IPhoneEnc')	-- to test what we can do with encrypted files
 local socket = require("socket")
 local https = require ("ssl.https")
@@ -9,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.41"
+local version = "v2.42"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time

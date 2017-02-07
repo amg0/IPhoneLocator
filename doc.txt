@@ -12,7 +12,7 @@ For those who really like it and feel like it, you can donate what you want here
 [b]Version Change Log[/b]
 http://forum.micasaverde.com/index.php/topic,29732.msg210672.html#msg210672
 
-[b]Latest Version : 2.41[/b]
+[b]Latest Version : 2.42[/b]
 [i]Features[/i]
 [list]
 [li]Monitor the location of one or more of your apple devices in a [b]single iCloud account[/b]. They are managed by a single root VERA device with a single polling loop updating all associated children devices for the multiple apple devices you want to monitor.  if you want to monitor only one device ( or have only one device in iCloud ), only the root VERA device is used so you will not see more than one device in that case.[/li]

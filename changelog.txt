@@ -3,6 +3,10 @@ Initial help topic is getting too big, so I am putting a version change log here
 Latest version doc : [url=http://forum.micasaverde.com/index.php/topic,16907.msg130221.html#msg130221]http://forum.micasaverde.com/index.php/topic,16907.msg130221.html#msg130221[/url]
 
 [i]Change Log[/i]
+[b]Version 2.42 [/b]
+[list]
+[li]Fix for json decoder, use dkjson 1.2[/li]
+[/list]
 [b]Version 2.41 [/b]
 [list]
 [li]Fix for iCloud's protocol change to get location information. bonus: it saves one web service call ![/li]
