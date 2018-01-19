@@ -315,7 +315,9 @@ function appendBootstrap(deviceID) {
 		// but not with latest 3.18 and 3.exp 
 		// so forcing the load to be with official release v3 ( which is 3.17 today Sept 13 2014 ) 
 		// script.src = "//maps.google.com/maps/api/js?v=3&callback=handleApiReady";
-		script.src = "//maps.google.com/maps/api/js?v=3.17&callback=handleApiReady";
+
+		// script.src = "//maps.google.com/maps/api/js?v=3.25&callback=handleApiReady";
+		script.src = "//maps.google.com/maps/api/js?callback=handleApiReady";
 		document.body.appendChild(script);
 	}
 }
@@ -432,31 +434,6 @@ function getAppleNames( deviceID ) {
 	var names = get_device_state(root,  iphone_Svs, 'ICloudDevices',1);
 	return names.split(',');
 }
-
-// function addSaveButtonForMap(deviceID) {
-	// if (jQuery("#status_display").length>0) {
-		// var e = jQuery("#status_display");
-		// e.parent().remove();
-	// } 
-	
-	// jQuery("table#tbl_map tbody").append("<tr><td>test</td><td></td></tr>");
-	
-	// // initialize the save Database to Null object
-	// jQuery( "#status_display" ).data( "DBsave",{});
-	
-// }
-// function addSaveButton(deviceID) {
-	// if (jQuery("#status_display").length>0) {
-		// var e = jQuery("#status_display");
-		// e.parent().remove();
-	// } 
-	
-	// jQuery("div.left_menu").append("<div class='menu_item'><div class='menu_item_center' id='status_display' onclick='saveToVera("+deviceID+")'>Save</div></div>");
-	
-	// // initialize the save Database to Null object
-	// jQuery( "#status_display" ).data( "DBsave",{});
-	
-// }
 
 function initializeAppleNames( deviceID ) {
 	// first clean up all options
@@ -965,22 +942,11 @@ function goodemail(email)
 }
 
 //-------------------------------------------------------------
-// Variable saving ( log , then full save )
+// Variable saving 
 //-------------------------------------------------------------
-// function saveVar(deviceID,  iphone_Svs, varName, varVal)
-// {
-    // showStatus ("Save Needed...", true);
-	// logForSaveToVera( deviceID, varName, varVal);
-	// // clearStatus();
-// }
 function saveVar(deviceID,  service, varName, varVal, reload)
 {
-	set_device_state (deviceID, service, varName, varVal, 0);	
-	// set_device_state (deviceID, service, varName, varVal, 1);	// lost in case of luup restart
-/************* SOME PEOPLE HAVE ISSUES WITH SAVING ***********************
-	// set_device_state (deviceID, service, varName, varVal, 0);	// only updated at time of luup restart
-	set_device_state (deviceID, service, varName, varVal, (reload==true) ? 0 : 1);	// lost in case of luup restart
-	
+	// set_device_state (deviceID, service, varName, varVal, 0);	
 	// 3rd method : updated immediately but not reflected !
 	var url = buildVariableSetUrl( deviceID, varName, varVal)
 	var jqxhr = jQuery.ajax({
@@ -995,81 +961,11 @@ function saveVar(deviceID,  service, varName, varVal, reload)
 		// error, keep track of error, keep entry in DB for next save
 
 	});
-***************************************/
-}
-//----------------------------------------------------------------------------
-// logForSaveToVera( deviceID, varName, varVal )
-// do not save immediately but remember about the need to save in the save DB
-//----------------------------------------------------------------------------
-function logForSaveToVera( deviceID, varName, varVal )
-{
-	var db = jQuery( "#status_display" ).data( "DBsave");
-
-	if (db[deviceID]== undefined) {
-		db[deviceID] = {};	// warning: object, not array
-	}
-	
-	if (db[deviceID][varName]==undefined) {
-		db[deviceID][varName] = {};	// warning: object, not array
-	}
-	db[deviceID][varName] = varVal;
-	jQuery( "#status_display" ).data( "DBsave",db);
-}
-
-//----------------------------------------------------------------------------
-// saveToVera( deviceID )
-// performs the complete save of all pending modifications
-// based on the save database ( data attached for DOM node status_display )
-//----------------------------------------------------------------------------
-function saveToVera( deviceID )
-{
-	var ok=true;
-	// get pending saves DB
-	var db = jQuery( "#status_display" ).data( "DBsave");
-	
-	// for each deviceid
-	jQuery.each(db, function(deviceindex,deviceobj) {
-		// for each change that was made
-		for ( var p in deviceobj ) { 
-			var url = buildVeraURL( deviceindex, "luup.variable_set", p, deviceobj[p]);
-			var jqxhr = jQuery.ajax({
-				url:url,
-				async:false		// important to be in synchronous mode in that case
-			})  
-			.done(function() {
-				// success, remove pending save for this variable
-				db[deviceindex][p]=null;
-			})
-			.fail(function() {
-				// error, keep track of error, keep entry in DB for next save
-				ok=false;
-				showStatus("An error occurred",true);
-			});
-		}
-	});
-	
-	// because we worked in synchronous mode, we are sure all is done when we reach this point
-	if (ok) { 
-		showStatus("Saved",false);
-		db[deviceID] = {};	// warning: object, not array
-		window.setTimeout(clearStatus, 3500);
-	}
-	
-	// save pending saved DB
-	jQuery( "#status_display" ).data( "DBsave",db);
 }
 
 //-------------------------------------------------------------
 // Helper functions to build URLs to call VERA code from JS
 //-------------------------------------------------------------
-function buildVeraURL( deviceID, fnToUse, varName, varValue)
-{
-	var urlHead = '' + ip_address + 'id=lu_action&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&action=RunLua&Code=';
-	if (varValue != null)
-		return urlHead + fnToUse + '("' + iphone_Svs + '", "' + varName + '", "' + varValue + '", ' + deviceID + ')';
-
-	return encodeURI(urlHead + fnToUse + '("' + iphone_Svs + '", "' + varName + '", "", ' + deviceID + ')');
-}
 
 function buildVariableSetUrl( deviceID, varName, varValue)
 {
