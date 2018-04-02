@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.44"
+local version = "v2.45"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -749,7 +749,7 @@ end
 
 -- opt_distance is optional, it can be passed for precalculate distance ( google distance matrix api for instance )
 -- if is null, the function will calculate the distance
-function updateDevice(lul_device,location_obj,timestamp, address,opt_distance,opt_duration)
+function updateDevice(lul_device,location_obj,timestamp, address,opt_distance,opt_duration,battery)
 	local lat,long = 0,0
 	if (location_obj ~= nil) then
 		long = location_obj.longitude
@@ -762,6 +762,11 @@ function updateDevice(lul_device,location_obj,timestamp, address,opt_distance,op
 	local muted = luup.variable_get(service,"Muted", lul_device)
 	local unit = luup.variable_get(service,"Unit", lul_device)
 	local timestamp = timestamp or os.time()
+	
+	if (battery ~=nil) then
+		battery = math.floor( tonumber(battery)* 100 )
+		setVariableIfChanged("urn:micasaverde-com:serviceId:HaDevice1", "BatteryLevel", battery, lul_device)		
+	end
 	
 	-- if lat and long are zero, it means update has not really worked, keep values unchanged
 	if (lat~=0) or (long~=0) then
@@ -1118,7 +1123,7 @@ function forceRefresh(lul_device)
 			local dests={}
 			local devices={}
 			local timestamps={}
-			
+			local batteryLevels={}
 			for key,value in pairs(devicemap) do
 				value.name = value.name:trim()
 				local devicename = deviceShouldBeReported(value.name,pattern)
@@ -1138,6 +1143,7 @@ function forceRefresh(lul_device)
 						dests[ #dests ].lat = homelatitude
 						dests[ #dests ].lon = homelongitude
 						devices[ #devices+1 ] = targetdevice
+						batteryLevels[#batteryLevels+1]=device.batteryLevel
 					else
 						--- Generating Msg for User Interface
 						updateDevice(targetdevice,nil,nil,"No Location Information for that device") --present
@@ -1152,7 +1158,8 @@ function forceRefresh(lul_device)
 					origins[key].location_obj,
 					timestamps[key],
 					formatAddress2(value,addresses[key]),	-- does not support {variable} so specific method
-					distances[key],durations[key]) 
+					distances[key],durations[key],
+					batteryLevels[key]) 
 			end
 		else	
 			-- distance mode == 'direct'
@@ -1208,7 +1215,7 @@ function forceRefresh(lul_device)
 						else
 							UserMessage("warning, could not find address from GPS coordinate")
 						end
-						updateDevice(targetdevice, device.location, device.location.timeStamp/1000, address) --present
+						updateDevice(targetdevice, device.location, device.location.timeStamp/1000, address,nil,nil,device.batteryLevel) --present
 					else
 						--- Generating Msg for User Interface
 						updateDevice(targetdevice,nil,nil,"No Location Information for that device") --present
