@@ -241,12 +241,19 @@ end
 ------------------------------------------------
 -- LUA Utils
 ------------------------------------------------
-function string:split(sep) -- from http://lua-users.org/wiki/SplitJoin
+local function Split(str, sep)
 	local sep, fields = sep or ":", {}
 	local pattern = string.format("([^%s]+)", sep)
-	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	str:gsub(pattern, function(c) fields[#fields+1] = c end)
 	return fields
 end
+
+-- function string:split(sep) -- from http://lua-users.org/wiki/SplitJoin
+	-- local sep, fields = sep or ":", {}
+	-- local pattern = string.format("([^%s]+)", sep)
+	-- self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	-- return fields
+-- end
 
 function string:mytemplate(variables)
 	return (self:gsub('{(.-)}', 
@@ -945,7 +952,7 @@ function formatAddress(lul_device,json_obj)
 				--
 				-- user is choosing classical index based format
 				--
-				local tbl = addrFormat:split(",")
+				local tbl = Split(addrFormat,",")
 				for i,v in pairs(tbl) do 
 					v = tonumber(v)
 					if (v~=nil) and (v<= #tmp) then
@@ -970,7 +977,7 @@ function deviceShouldBeReported(name, pattern)
 	-- name = escapeQuotes(name)
 	-- pattern= escapePattern(pattern)
 	--debug("ESCAPED versions -->iCloud device detected:"..name.." pattern:"..pattern)
-	local tblpattern = pattern:split(",")
+	local tblpattern = Split(pattern,",")
 	for key,value in pairs(tblpattern) do
 		local match = string.match(name,value)
 		if (match~=nil) then
@@ -1245,10 +1252,10 @@ function getPeriodForDistanceAndMap( period, distance, pollingMap )
 	------------------------------------------------
 	-- pollingMap is a csv list of pairs dist:time
 	------------------------------------------------
-	local tbl = pollingMap:split(",")
+	local tbl = Split(pollingMap,",")
 	debug("Polling map: "..json.encode(tbl))
 	for i,v in pairs(tbl) do 	
-		local distandpoll = v:split(":")	
+		local distandpoll = Split(v,":")	
 		local distmin = distandpoll[1]+0	-- convert to number
 		local periodmin= tonumber(distandpoll[2])
 		if (distance>=distmin) then
@@ -1347,7 +1354,7 @@ function buildParams(str1,str2)
 end
 
 function decodeParams(p)
-	return p:split()
+	return Split(p)
 end
 
 function loop(params)
@@ -1454,7 +1461,7 @@ function createChildDevices(lul_device)
 		local handle = luup.chdev.start(lul_device);
 		
 		--- search first device of pattern as this is the prefered root device
-		local firstpatternname = pattern:split(",")[1]
+		local firstpatternname = Split(pattern,",")[1]
 		if (firstpatternname~=nil) then
 			debug("looking for firstpatternname ="..firstpatternname)
 			for key,value in pairs(devicemap) do
