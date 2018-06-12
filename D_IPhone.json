@@ -513,6 +513,33 @@
 				}
 			}
 		]
+	},
+	{
+		"id": 4,
+		"label": {
+			"lang_tag": "battery_goes_below",
+			"text": "Battery goes below"
+		},
+		"serviceId": "urn:micasaverde-com:serviceId:HaDevice1",
+		"norepeat": "1",
+		"argumentList": [
+			{
+				"id": 1,
+				"dataType": "i1",
+				"name": "BatteryLevel",
+				"comparisson": "<",
+				"prefix": {
+					"lang_tag": "level",
+					"text": "Level"
+				},
+				"suffix": {
+				},
+				"HumanFriendlyText": {
+					"lang_tag": "hft_battery_goes_below",
+					"text": "_DEVICE_NAME_ battery goes below _ARGUMENT_VALUE_ %"
+				}
+			}
+		]
 	}
   ],
   "DeviceType": "urn:schemas-upnp-org:device:IPhoneLocator:1",
