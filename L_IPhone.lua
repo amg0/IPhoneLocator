@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.45"
+local version = "v2.46"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -1746,6 +1746,9 @@ function startupDeferred(lul_device)
 	local Range= luup.variable_get(service,"Range", lul_device)
 	if Range == nil then
 		luup.variable_set(service,"Range",tostring(0.2),lul_device)
+	else
+		Range = tonumber( "0"..Range )
+		luup.variable_set(service,"Range",Range,lul_device)
 	end    
 
 	local MapUrl = luup.variable_get(service,"MapUrl", lul_device)
