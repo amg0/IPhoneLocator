@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.46"
+local version = "v2.47"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -165,7 +165,7 @@ end
 local HModes = { "Home", "Away", "Night", "Vacation" ,"Unknown" }
 
 local function setHouseMode( newmode ) 
-	log(string.format("HouseMode, setHouseMode( %s )",newmode))
+	debug(string.format("HouseMode, setHouseMode( %s )",newmode))
 	newmode = tonumber(newmode)
 	if (newmode>=1) and (newmode<=4) then
 		UserMessage("SetHouseMode to "..newmode)
@@ -183,7 +183,7 @@ local function getMode()
 	-- local req_result =  luup.attr_get("Mode")
 	-- debug("getMode() = "..req_result)
 	req_result = tonumber( req_result or (#HModes) )
-	log(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result]))
+	debug(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result]))
 	return req_result 
 end
 
@@ -717,7 +717,7 @@ end
 -- if all participating devices are away, and mode is home or night then set mode to away  ( meaning vacation is ignored )
 -- if 1 participating devices are present, and mode is away then set mode to home ( meaning vacation or night is left unchanged )
 local function updateHouseMode(ui7)
-	log(string.format("updateHouseMode(%s)",ui7))
+	debug(string.format("updateHouseMode(%s)",ui7))
 	if (ui7=="true") then
 		local curMode = getMode()
 		local nAway,nPresent,nParticipating = 0,0,0
@@ -842,7 +842,7 @@ function updateDevice(lul_device,location_obj,timestamp, address,opt_distance,op
 			log("Device Status("..lul_device.."): muted")
 			iconcode = 50	--Away and not moving
 		elseif ( math.max(0,newdistance-accuracy) < isHomeDistance) then
-			log("Device Status("..lul_device.."): in Home")
+			debug("Device Status("..lul_device.."): in Home")
 			setVariableIfChanged(service, "Present",1, lul_device) --present
 			iconcode = 100
 			updateHouseMode(ui7check)
@@ -973,7 +973,7 @@ end
 
 function deviceShouldBeReported(name, pattern)
 	-- Pattern is a CSV list of LUA patterns
-	log("iCloud device detected:"..name.." pattern:"..pattern)
+	debug("iCloud device detected:"..name.." pattern:"..pattern)
 	-- name = escapeQuotes(name)
 	-- pattern= escapePattern(pattern)
 	--debug("ESCAPED versions -->iCloud device detected:"..name.." pattern:"..pattern)
@@ -1094,7 +1094,7 @@ end
 -- no output, just update the device variables
 ------------------------------------------------
 function forceRefresh(lul_device)
-	log("forceRefresh action is called on behalf of device:"..lul_device)
+	debug("forceRefresh action is called on behalf of device:"..lul_device)
 	lul_device = tonumber(lul_device)
 	
 	-- Since refreshed are managed by the device holding the iCloud account
@@ -1342,7 +1342,7 @@ function getPeriod(lul_device)
 		end
 	end
 
-	log("Period chosen for device:"..lul_device.." = "..period)
+	debug("Period chosen for device:"..lul_device.." = "..period)
 	return period
 end
 

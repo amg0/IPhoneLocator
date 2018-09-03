@@ -944,32 +944,38 @@ function goodemail(email)
 //-------------------------------------------------------------
 // Variable saving 
 //-------------------------------------------------------------
-function saveVar(deviceID,  service, varName, varVal, reload)
+function saveVar(deviceID,  service, varName, varVal)
 {
-	// set_device_state (deviceID, service, varName, varVal, 0);	
-	// 3rd method : updated immediately but not reflected !
-	var url = buildVariableSetUrl( deviceID, varName, varVal)
-	var jqxhr = jQuery.ajax({
-		url:url,
-		async:false		// important to be in synchronous mode in that case
-	})  
-	.done(function() {
-		// success, remove pending save for this variable
-
-	})
-	.fail(function() {
-		// error, keep track of error, keep entry in DB for next save
-
-	});
+	if (typeof(g_ALTUI)=="undefined") {
+		//Vera
+		if (api != undefined ) {
+			api.setDeviceState(deviceID, service, varName, varVal,{dynamic:false})
+			api.setDeviceState(deviceID, service, varName, varVal,{dynamic:true})
+		}
+		else {
+			set_device_state(deviceID, service, varName, varVal, 0);
+			set_device_state(deviceID, service, varName, varVal, 1);
+		}
+		var url = buildVariableSetUrl( deviceID, service, varName, varVal)
+		jQuery.get( url )
+			.done(function(data) {
+			})
+			.fail(function() {
+				alert( "Save Variable failed" );
+			})
+	} else {
+		//Altui
+		set_device_state(deviceID, service, varName, varVal);
+	}
 }
 
 //-------------------------------------------------------------
 // Helper functions to build URLs to call VERA code from JS
 //-------------------------------------------------------------
 
-function buildVariableSetUrl( deviceID, varName, varValue)
+function buildVariableSetUrl( deviceID, service, varName, varValue)
 {
-	var urlHead = '' + ip_address + 'id=variableset&DeviceNum='+deviceID+'&serviceId='+iphone_Svs+'&Variable='+varName+'&Value='+varValue;
+	var urlHead = '' + ip_address + 'id=variableset&DeviceNum='+deviceID+'&serviceId='+service+'&Variable='+varName+'&Value='+varValue;
 	return encodeURI(urlHead);
 }
 
