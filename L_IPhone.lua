@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.47"
+local version = "v2.48"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -115,6 +115,30 @@ local function setVariableIfChanged(serviceId, name, value, deviceId)
 	end
 end
 
+function myHttps(url)
+	local failed = 1
+	local data = ""
+	local response_body = {}
+	debug("Https request url=" .. url)	
+	local response, status, headers = https.request{
+		method="GET",
+		url=url,
+		headers = commonheaders,
+		source = ltn12.source.string(data),
+		sink = ltn12.sink.table(response_body)
+	}
+	debug("Https request Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
+	
+	if (response==1) then
+		failed = 0
+		data = table.concat(response_body)
+	else
+		failed = 1
+	end
+
+	return failed, data, status
+end
+
 local function getIP()
 	-- local stdout = io.popen("GetNetworkState.sh ip_wan")
 	-- local ip = stdout:read("*a")
@@ -183,7 +207,7 @@ local function getMode()
 	-- local req_result =  luup.attr_get("Mode")
 	-- debug("getMode() = "..req_result)
 	req_result = tonumber( req_result or (#HModes) )
-	debug(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result]))
+	debug(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result] or ""))
 	return req_result 
 end
 
@@ -400,6 +424,16 @@ function getSpeed(lul_device)
 	return speed
 end
 
+
+function addKeyToUrl(lul_device,url)
+	local root_device = getRoot(lul_device)
+	local key = (luup.variable_get(service,"GoogleMapKey", root_device) or "none")
+	if (key~="none") and (key~="") then
+		url = url .. "&key="..key
+	end
+	return url
+end
+
 ------------------------------------------------
 -- HTTP Handlers
 ------------------------------------------------
@@ -527,7 +561,7 @@ function distanceBetween(lat1, lon1, lat2, lon2, distance_unit)
         return dist
 end
 
-function getAddressFromLatLong( lat, long, language, prevlat, prevlong )
+function getAddressFromLatLong( lul_device, lat, long, language, prevlat, prevlong )
 	local timeout = 30
 	local lang = language or "en"
 	if (prevlat ~=nil) and (prevlong ~=nil) then
@@ -537,16 +571,18 @@ function getAddressFromLatLong( lat, long, language, prevlat, prevlong )
 			return -1,""
 		end
 	end
-	local url = string.format("http://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&language=%s&sensor=false",lat,long,lang)
+	local url = string.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&language=%s&sensor=false",lat,long,lang)
+	url = addKeyToUrl(lul_device,url)
 	debug("Sending GET to Google url:"..url)
-	local httpcode,content = luup.inet.wget(url,timeout)
-	--debug("result httpcode:"..httpcode)
-	--debug("result content:"..content)
-	return httpcode,content
+	local failed,content,httpcode = myHttps(url)	-- todo add Timeout
+	debug("result failed:"..failed)
+	debug("result httpcode:"..httpcode)
+	debug("result content:"..content)
+	return failed,content,httpcode
 end
 
 
-function getDistancesAddressesMatrix(origins,destinations,distancemode,language)
+function getDistancesAddressesMatrix(lul_device,origins,destinations,distancemode,language)
 	debug("getDistancesAddressesMatrix")
 	local timeout = 30
 	local distances={}
@@ -557,16 +593,18 @@ function getDistancesAddressesMatrix(origins,destinations,distancemode,language)
 	for key,value in pairs(origins) do orgs[#orgs+1]=(value.lat..","..value.lon) end
 	for key,value in pairs(destinations) do dests[#dests+1]=(value.lat..","..value.lon) end
 	local url = string.format(
-		"http://maps.googleapis.com/maps/api/distancematrix/json?origins=%s&destinations=%s&mode=%s&language=%s&sensor=false",
+		"https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s&destinations=%s&mode=%s&language=%s&sensor=false",
 		table.concat(orgs,"|"),
 		table.concat(dests,"|"),
 		distancemode,
 		language)
+	url = addKeyToUrl(lul_device,url)
 	debug("Sending GET to Google distance matrix url:"..url)
-	local httpcode,content = luup.inet.wget(url,timeout)
+	local failed,content,httpcode = myHttps(url)	-- todo add Timeout
+	debug("result failed:"..failed)
 	debug("result httpcode:"..httpcode)
 	debug("result content:"..content)
-	if (httpcode==0) then
+	if (failed==0) then
 		-- "status" : "OVER_QUERY_LIMIT"
 		if ( string.find(content, "OVER_QUERY_LIMIT") ~= nil ) then
 			addresses[1]="Google Quota exceeded"
@@ -1079,8 +1117,11 @@ function getsetMapUrl(lul_device)
 	variables["0"]= url_encode(luup.attr_get ('name', lul_device))
 	variables["1"]= (luup.variable_get(service,"CurLat", lul_device) or "")
 	variables["2"]= (luup.variable_get(service,"CurLong", lul_device) or "")
-	debug("getsetMapUrl("..lul_device..") Variables="..json.encode(variables))
 	result = MAP_URL:mytemplate(variables)	-- variable substitution
+	-- if (key~="none") then
+		-- result = result .. "&key="..key
+	-- end
+	debug("getsetMapUrl("..lul_device..") url="..result)
 
 	-- store result here as this is the only way to return value for the uPNP action ( at least it seems )
 	luup.variable_set(service,"MapUrl",result,lul_device)	
@@ -1158,7 +1199,7 @@ function forceRefresh(lul_device)
 					end
 				end
 			end			
-			local distances,durations,addresses = getDistancesAddressesMatrix(origins,dests,distancemode,language)
+			local distances,durations,addresses = getDistancesAddressesMatrix(lul_device,origins,dests,distancemode,language)
 			for key,value in pairs(devices) do 
 				updateDevice(
 					value,	-- deviceid
@@ -1192,7 +1233,7 @@ function forceRefresh(lul_device)
 						if (prevlocation=="") or (prevlocation==PRIVACY_MODE) then
 							prevlatitude,prevlongitude = 0,0	-- force a call to google to refresh address
 						end
-						local httpcode, str = getAddressFromLatLong(device.location.latitude, device.location.longitude,language,prevlatitude,prevlongitude)
+						local httpcode, str = getAddressFromLatLong(lul_device,device.location.latitude, device.location.longitude,language,prevlatitude,prevlongitude)
 						if (httpcode==0) then -- http success
 						
 							-- "status" : "OVER_QUERY_LIMIT"
@@ -1572,10 +1613,11 @@ function startupDeferred(lul_device)
 		debug("UIlang="..lang)
 		
 		getSetVariable(service, "RootPrefix", lul_device, "(*)")	-- by default, does not participate in HouseMode Calculation
-		local email = luup.variable_get(service,"Email", lul_device)
-		if email == nil then
-			luup.variable_set(service,"Email","noname@dot.com",lul_device)
+		local key = getSetVariable(service, "GoogleMapKey", lul_device, "none")	    -- new key needed for google map API
+		if (key=="") then
+			luup.variable_get(service,"GoogleMapKey", "", lul_device)
 		end
+		local email = getSetVariable(service, "Email", lul_device, "noname@dot.com")	
 
 		-- new with 1.57, encrypt password		
 		debug("Plugin version: "..version.." old device Version major:"..major.." minor:"..minor)

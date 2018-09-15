@@ -7,49 +7,55 @@ var ip_address = data_request_url;
 //-------------------------------------------------------------
 // Utilities Javascript
 //-------------------------------------------------------------
-
-if (typeof String.prototype.format == 'undefined') {
-	String.prototype.format = function()
+var IPhoneLocator_Utils = (function() {
+	function isFunction(x) {
+	  return Object.prototype.toString.call(x) == '[object Function]';
+	};
+	function format(str)
 	{
-	   var content = this;
-	   for (var i=0; i < arguments.length; i++)
+	   var content = str;
+	   for (var i=1; i < arguments.length; i++)
 	   {
-			var replacement = new RegExp('\\{' + i + '\\}', 'g');	// regex requires \ and assignment into string requires \\,
+			var replacement = new RegExp('\\{' + (i-1) + '\\}', 'g');	// regex requires \ and assignment into string requires \\,
 			// if ($.type(arguments[i]) === "string")
 				// arguments[i] = arguments[i].replace(/\$/g,'$');
 			content = content.replace(replacement, arguments[i]);  
 	   }
 	   return content;
+	};	
+	function rgb2hex(r, g, b) {
+		return "#" + (65536 * r + 256 * g + b).toString(16);
 	};
-};
+	function escapeLuaPattern(val) {
+		var result="";
+		var chars = "( ) . % + - * ? ["; //^ $
+		jQuery.each(chars.split(" "),function(idx,c) {
+			esc_c = c.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+			val = val.replace( new RegExp(esc_c, 'g'),'%'+c);
+		});
+		return val;
+	};
+	//-------------------------------------------------------------
+	// SYNCHRONOUS HTTP Get request , returns the responseText
+	//-------------------------------------------------------------
+	function getURL(url){
+		return jQuery.ajax({
+			type: "GET",
+			url: url,
+			cache: false,
+			async: false
+		}).responseText;
+	};
+	return {
+		isFunction:isFunction,
+		rgb2hex:rgb2hex,
+		escapeLuaPattern:escapeLuaPattern,
+		getURL:getURL
+		//format:format,
+	}
+})();
 
-function isFunction(x) {
-  return Object.prototype.toString.call(x) == '[object Function]';
-}
-function escapeLuaPattern(val) {
-	var result="";
-	var chars = "( ) . % + - * ? ["; //^ $
-	jQuery.each(chars.split(" "),function(idx,c) {
-		esc_c = c.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-		val = val.replace( new RegExp(esc_c, 'g'),'%'+c);
-	});
-	return val;
-}
-function rgb2hex(r, g, b) {
-	return "#" + (65536 * r + 256 * g + b).toString(16);
-}
 
-//-------------------------------------------------------------
-// SYNCHRONOUS HTTP Get request , returns the responseText
-//-------------------------------------------------------------
-function getURL(url){
-    return jQuery.ajax({
-        type: "GET",
-        url: url,
-        cache: false,
-        async: false
-    }).responseText;
-}
 
 //-------------------------------------------------------------
 // Utilities for searching Vera devices
@@ -78,6 +84,15 @@ function findRootDevice(deviceID)
 {
 	var idx = findRootDeviceIdx(deviceID) ;
 	return jsonp.ud.devices[idx].id;
+}
+
+//-------------------------------------------------------------
+// getGoogleMapKey(deviceID) returns the key or ""
+//-------------------------------------------------------------
+function getGoogleMapKey( deviceID ) {
+	var root = findRootDevice(deviceID);
+	var key = get_device_state(root,  iphone_Svs, 'GoogleMapKey',1);
+	return key
 }
 
 //-------------------------------------------------------------
@@ -117,7 +132,7 @@ function createPollingMap(home,base)
 			fillOpacity: 0.2,
 			map: home.map,
 			radius:value*1000,
-			strokeColor: rgb2hex(0,0,0),
+			strokeColor: IPhoneLocator_Utils.rgb2hex(0,0,0),
 			strokeOpacity:1,
 			strokeWeight:1,
 			visible:jQuery( "#pollmap" )[0].checked
@@ -307,17 +322,13 @@ function appendBootstrap(deviceID) {
 		setTimeout("handleApiReady()", 500);
 	}
 	else {
+		var key = getGoogleMapKey(deviceID)
 		var script = document.createElement("script");
 		script.type = "text/javascript";
-		//script.src = "//maps.google.com/maps/api/js?sensor=false&callback=handleApiReady";
-		// controls ( zoom etc ) appear with 3.17 
-		// script.src = "//maps.google.com/maps/api/js?v=3.17&callback=handleApiReady";
-		// but not with latest 3.18 and 3.exp 
-		// so forcing the load to be with official release v3 ( which is 3.17 today Sept 13 2014 ) 
-		// script.src = "//maps.google.com/maps/api/js?v=3&callback=handleApiReady";
-
-		// script.src = "//maps.google.com/maps/api/js?v=3.25&callback=handleApiReady";
 		script.src = "//maps.google.com/maps/api/js?callback=handleApiReady";
+		if (key!="none") {
+			script.src += "&key="+key
+		}
 		document.body.appendChild(script);
 	}
 }
@@ -457,7 +468,7 @@ function addOptionToTarget(value,bEscape)
 {
 	if (value!='') {
 		if (bEscape!==false)
-			value = escapeLuaPattern(value);
+			value = IPhoneLocator_Utils.escapeLuaPattern(value);
 		var option = new Option(value, value); 
 		jQuery('#iphone_NameTarget').append(option);
 	}
@@ -1014,7 +1025,7 @@ function buildIPhoneHandlerUrl(deviceID,command,params)
 function ForceRefreshDevice(deviceID, cbfunc)
 {
 	var url = buildUPnPActionUrl(deviceID,iphone_Svs,'ForceRefresh');
-	if (isFunction(cbfunc)) {
+	if (IPhoneLocator_Utils.isFunction(cbfunc)) {
 		jQuery.ajax({
 			type: "GET",
 			url: url,
@@ -1027,6 +1038,6 @@ function ForceRefreshDevice(deviceID, cbfunc)
 		});
 	}
 	else
-		return getURL(url);
+		return IPhoneLocator_Utils.getURL(url);
 	return "async";
 }
