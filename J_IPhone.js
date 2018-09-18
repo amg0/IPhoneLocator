@@ -46,51 +46,52 @@ var IPhoneLocator_Utils = (function() {
 			async: false
 		}).responseText;
 	};
+	//-------------------------------------------------------------
+	// Utilities for searching Vera devices
+	//-------------------------------------------------------------
+	function findDeviceIdx(deviceID) 
+	{
+		//jsonp.ud.devices
+		for(var i=0; i<jsonp.ud.devices.length; i++) {
+			if (jsonp.ud.devices[i].id == deviceID) 
+				return i;
+		}
+		return null;
+	};
+
+	function findRootDeviceIdx(deviceID) 
+	{
+		var idx = IPhoneLocator_Utils.findDeviceIdx(deviceID);
+		while (jsonp.ud.devices[idx].id_parent != 0)
+		{
+			idx = IPhoneLocator_Utils.findDeviceIdx(jsonp.ud.devices[idx].id_parent);
+		}
+		return idx;
+	};
+
+	function findRootDevice(deviceID)
+	{
+		var idx = IPhoneLocator_Utils.findRootDeviceIdx(deviceID) ;
+		return jsonp.ud.devices[idx].id;
+	};
+	
 	return {
 		isFunction:isFunction,
 		rgb2hex:rgb2hex,
 		escapeLuaPattern:escapeLuaPattern,
-		getURL:getURL
+		getURL:getURL,
+		findDeviceIdx:findDeviceIdx,
+		findRootDeviceIdx:findRootDeviceIdx,
+		findRootDevice:findRootDevice
 		//format:format,
 	}
 })();
-
-
-
-//-------------------------------------------------------------
-// Utilities for searching Vera devices
-//-------------------------------------------------------------
-function findDeviceIdx(deviceID) 
-{
-	//jsonp.ud.devices
-    for(var i=0; i<jsonp.ud.devices.length; i++) {
-        if (jsonp.ud.devices[i].id == deviceID) 
-			return i;
-    }
-	return null;
-}
-
-function findRootDeviceIdx(deviceID) 
-{
-	var idx = findDeviceIdx(deviceID);
-	while (jsonp.ud.devices[idx].id_parent != 0)
-	{
-		idx = findDeviceIdx(jsonp.ud.devices[idx].id_parent);
-	}
-	return idx;
-}
-
-function findRootDevice(deviceID)
-{
-	var idx = findRootDeviceIdx(deviceID) ;
-	return jsonp.ud.devices[idx].id;
-}
 
 //-------------------------------------------------------------
 // getGoogleMapKey(deviceID) returns the key or ""
 //-------------------------------------------------------------
 function getGoogleMapKey( deviceID ) {
-	var root = findRootDevice(deviceID);
+	var root = IPhoneLocator_Utils.findRootDevice(deviceID);
 	var key = get_device_state(root,  iphone_Svs, 'GoogleMapKey',1);
 	return key
 }
@@ -101,7 +102,7 @@ function getGoogleMapKey( deviceID ) {
 function getDevicePollingMap(deviceID)
 {
 	// only roots have polling maps
-	var root = findRootDevice(deviceID);
+	var root = IPhoneLocator_Utils.findRootDevice(deviceID);
     var auto= get_device_state(root,  iphone_Svs, 'PollingAuto',1);
     var pollmap = get_device_state(root,  iphone_Svs, 'PollingMap',1);
 	if (pollmap=="_")
@@ -149,8 +150,8 @@ function createPollingMap(home,base)
 function getChildrenInfoMap(deviceID)
 {
 	var map = [];
-	var root = findRootDevice(deviceID);
-	var thisid = findDeviceIdx(deviceID) ;
+	var root = IPhoneLocator_Utils.findRootDevice(deviceID);
+	var thisid = IPhoneLocator_Utils.findDeviceIdx(deviceID) ;
 	for(var i=0; i<jsonp.ud.devices.length; i++) {
 		// add all children of that root
         if ((jsonp.ud.devices[i].id_parent == root) && (thisid!=i))
@@ -168,7 +169,7 @@ function getChildrenInfoMap(deviceID)
 		map.push({
 			lat: get_device_state(root,  iphone_Svs, 'CurLat',1),
 			lng: get_device_state(root,  iphone_Svs, 'CurLong',1),
-			phonename: jsonp.ud.devices[findRootDeviceIdx(deviceID)].name
+			phonename: jsonp.ud.devices[IPhoneLocator_Utils.findRootDeviceIdx(deviceID)].name
 		});
 	}
 	return map;
@@ -340,7 +341,7 @@ function appendBootstrap(deviceID) {
 //-------------------------------------------------------------	
 function iphone_Map(deviceID) {
 	// first determine if it is a child device or not
-	var device = findDeviceIdx(deviceID);
+	var device = IPhoneLocator_Utils.findDeviceIdx(deviceID);
 	//var debug  = get_device_state(deviceID,  iphone_Svs, 'Debug',1);
 	var root = (device!=null) && (jsonp.ud.devices[device].id_parent==0);
     var homelat = get_device_state(deviceID,  iphone_Svs, 'HomeLat',1);
@@ -441,7 +442,7 @@ function iphone_Map(deviceID) {
 // UI interactivity in the Device TAB : Settings
 //-------------------------------------------------------------	
 function getAppleNames( deviceID ) {
-	var root = findRootDevice(deviceID);
+	var root = IPhoneLocator_Utils.findRootDevice(deviceID);
 	var names = get_device_state(root,  iphone_Svs, 'ICloudDevices',1);
 	return names.split(',');
 }
@@ -575,7 +576,7 @@ function iphone_Settings(deviceID) {
 		}
 	}
 	// first determine if it is a child device or not
-	var device = findDeviceIdx(deviceID);
+	var device = IPhoneLocator_Utils.findDeviceIdx(deviceID);
 	//var debug  = get_device_state(deviceID,  iphone_Svs, 'Debug',1);
 	var root = (device!=null) && (jsonp.ud.devices[device].id_parent==0);
     var email  = get_device_state(deviceID,  iphone_Svs, 'Email',1);

@@ -1,18 +1,17 @@
-From working going on the thread http://forum.micasaverde.com/index.php/topic,15565.0.html I created a plugin to report apple device position from the iCloud service. 
+original thread http://forum.micasaverde.com/index.php/topic,15565.0.html 
 
-Official version can be installed from the App Store. 
-Beta versions from here:
+Official version can be installed from the App Store. Beta versions from here:
 [url=http://apps.mios.com/test-plugin.php?id=4686&show=versions]http://apps.mios.com/test-plugin.php?id=4686&show=versions[/url]
 
 I summarized herebelow the information and features for this plugin.
 [glow=red,2,300]New[/glow]: You will find a step by step UI5 installation document here: http://code.mios.com/trac/mios_iphone-detector/export/147/trunk/iPhoneLocator/Install%20Doc.pdf
 
-For those who really like it and feel like it, you can donate what you want here on Paypal. It will not buy you more support not any garantee that this can be maintained or evolve in the future but if you want to show you are happy and like my kids to transform some of the time I steal from them into some 'concrete' returns, please feel very free ( and absolutely not forced to ) to donate whatever you want.  thank you ! : [url=https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted]https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted[/url].
+Cost: free, donation based on Paypal. thank you ! : [url=https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted]https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z5KFCB3VH6MCQ&lc=FR&item_name=amg0&item_number=IPhoneLocator&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted[/url].
 
 [b]Version Change Log[/b]
 http://forum.micasaverde.com/index.php/topic,29732.msg210672.html#msg210672
 
-[b]Latest Version : 2.43[/b]
+[b]Latest Version : 2.48[/b]
 [i]Features[/i]
 [list]
 [li]Monitor the location of one or more of your apple devices in a [b]single iCloud account[/b]. They are managed by a single root VERA device with a single polling loop updating all associated children devices for the multiple apple devices you want to monitor.  if you want to monitor only one device ( or have only one device in iCloud ), only the root VERA device is used so you will not see more than one device in that case.[/li]
@@ -112,6 +111,7 @@ If ( and only if ) the DistanceMode value is [b]"direct"[/b] then the 2 next pos
 [li][b]Debug[/b]: Debug mode or not, this affects ALL IPhoneLocator devices, not only this one and generates quite a number of log so, to be used only for troubleshooting purposes[/li]
 [li][b]MapUrl[/b] variable that holds the url to open that same google map in another window if wished[/li]
 [li][b]RootPrefix[/b] String used to prefix the name for the root device ( defaults to "(*)" )[/li]
+[li][b]GoogleMapKey[/b] Google Map Key that you can get from the google map cloud console. this is needed to allow the API calls to DistanceMatrix and Geocode API and map API from google. Please read the Google map key section in the document http://code.mios.com/svn/mios_iphone-detector/trunk/iPhoneLocator/Another%20UI7%20Install%20doc.pdf to understand and estimate the cost consequences. The first 200$ are not charged by Google[/li]
 [/list]
 
 [i]Notifications[/i]
