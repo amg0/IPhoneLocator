@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.48"
+local version = "v2.49"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -199,16 +199,15 @@ end
 
 local function getMode() 
 	debug("HouseMode, getMode()")
-	-- local url_req = "http://" .. getIP() .. ":3480/data_request?id=variableget&DeviceNum=0&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&Variable=Mode"
-	local url_req = "http://127.0.0.1:3480/data_request?id=variableget&DeviceNum=0&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&Variable=Mode"
-	local req_status, req_result = luup.inet.wget(url_req)
-	-- ISSUE WITH THIS CODE=> ONLY WORKS WITHIN GLOBAL SCOPE LUA, not in PLUGIN context
-	-- debug("calling getMode()...")
-	-- local req_result =  luup.attr_get("Mode")
-	-- debug("getMode() = "..req_result)
-	req_result = tonumber( req_result or (#HModes) )
-	debug(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result] or ""))
-	return req_result 
+	-- local url_req = "http://127.0.0.1:3480/data_request?id=variableget&DeviceNum=0&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&Variable=Mode"
+	-- local req_status, req_result = luup.inet.wget(url_req)
+	-- req_result = tonumber( req_result or (#HModes) )
+	-- debug(string.format("HouseMode, getMode() returns: %s, %s",req_result or "", HModes[req_result] or ""))
+	-- return req_result 
+	
+	local mode = luup.attr_get "Mode"
+	mode = tonumber( req_result or (#HModes) )
+	return mode
 end
 
 ------------------------------------------------
