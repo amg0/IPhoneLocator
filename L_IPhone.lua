@@ -800,7 +800,7 @@ function updateDevice(lul_device,location_obj,timestamp, address,opt_distance,op
 		lat = location_obj.latitude
 		debug(string.format("device:%d location:%s",lul_device,json.encode(location_obj)))
 	end
-	debug(string.format("updateDevice(%d) saving lat:%f long:%f time:%s addr:%s dist:%s dur:%s",lul_device,lat, long,timestamp or "",address or "",  opt_distance or "", opt_duration or ""))
+	debug(string.format("updateDevice(%d) saving lat:%f long:%f time:%s addr:%s dist:%s dur:%s bat:%s",lul_device,lat, long,timestamp or "",address or "",  opt_distance or "", opt_duration or "", battery or ""))
 	local iconcode = 0		-- for now, we think we are stable & away
 	local privacymode =  (luup.variable_get(service,"AddrFormat", lul_device)=="0")
 	local muted = luup.variable_get(service,"Muted", lul_device)
