@@ -13,7 +13,7 @@ local service = "urn:upnp-org:serviceId:IPhoneLocator1"
 local devicetype = "urn:schemas-upnp-org:device:IPhoneLocator:1"
 local UI7_JSON_FILE= "D_IPhone_UI7.json"
 local DEBUG_MODE = false
-local version = "v2.50"
+local version = "v2.51"
 local prefix = "child_"
 local PRIVACY_MODE = "Privacy mode"
 local RAND_DELAY = 4						-- random delay from period to avoid all devices going at the same time
@@ -700,17 +700,17 @@ function getAppleDeviceMap(username, password, pollingextra)
 	--
 	-- stage1 : to find server name 
 	--
-	--debug("***fmipmobile request =" .. json.encode({url="https://fmipmobile.icloud.com/fmipservice/device/" .. username .."/initClient",username=username,headers=commonheaders,data=data}) )	
+	-- debug("***fmipmobile request =" .. json.encode({url="https://fmipmobile.icloud.com/fmipservice/device/" .. username .."/initClient",username=username,headers=commonheaders,data=data}) )	
 	local response, status, headers = https.request{
 		method="POST",
 		url="https://fmipmobile.icloud.com/fmipservice/device/" .. username .."/initClient",
 		headers = commonheaders,
 		source = ltn12.source.string(data),
 		sink = ltn12.sink.table(response_body),
-		protocol = "tlsv1_2",
+		--protocol = "tlsv1_2",
 		verify = "none"
 	}
-	--sdebug("***fmipmobile response =" .. json.encode({res=response,sta=status,hea=headers}) )	
+
 	if (response==1) then
 		if (status==330) then
 			debug("*** after send stage1. Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
@@ -734,11 +734,11 @@ function getAppleDeviceMap(username, password, pollingextra)
 			UserMessage("Bad response from https://" .. stage2server .. "/fmipservice/device/" .. username .."/initClient")
 		else
 			UserMessage("iCloud refused access, Check credentials ?")	
-			debug("***Response=" .. json.encode({res=response,sta=status,hea=headers}) )	
 		end
 	else
 		UserMessage("failed to call fmipservice device",TASK_ERROR_PERM)	
 	end
+  debug("***fmipmobile response =" .. json.encode({res=response,sta=status,hea=headers}) )	
 	return nil
 end
 
